@@ -1,7 +1,6 @@
 MqlTradeRequest _req;
 MqlTradeResult  _res;
 #include <Components\Log.mqh>
-#include <Components\Util.mqh>
 #include <Components\ZigZag.mqh>
 #include <Components\OrderGraph.mqh>
 #include <Components\OrderManager.mqh>
