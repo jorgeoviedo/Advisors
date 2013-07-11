@@ -1,33 +1,33 @@
 MqlTradeRequest _req;
 MqlTradeResult  _res;
 #include <Components\ZigZag.mqh>
-#include <Components\OrderGraph.mqh>
 #include <Components\OrderManager.mqh>
 
 void OnTimer()
 {    readZZ();
-     checkZigZagWith(High,ORDER_TYPE_SELL);
-     checkZigZagWith(Low, ORDER_TYPE_BUY );
+     checkZZForOpen(High,ORDER_TYPE_SELL);
+     checkZZForOpen(Low, ORDER_TYPE_BUY );
+     checkOrderForModifySLTP(_req, _res);
      printZZ();
 }
 
-void checkZigZagWith(double &checkData[], ENUM_ORDER_TYPE type)
+void checkZZForOpen(double &checkData[], ENUM_ORDER_TYPE type)
 {    if(evalZZ(checkData))
      {  if(PositionsTotal()==0)
-        {  stepForOpenOrder(type, _req, _res);
+        {  lastAccountProfit = 0;
+           setOrderOpen(type, _req, _res);
+           executeOrder(_req, _res);
            writeLogOrder(_req, _res);
-           paintOrder(_req);        
+           paintOrder(_req);
         }
         else
         {  if(!(_req.type == type))
-           {  stepForDeleteOrder(_req, _res);
+           {  setOrderDelete(_req);
+              executeOrder(_req, _res);
               writeLogOrder(_req, _res);
-              paintOrder(_req);
-              stepForOpenOrder(type, _req, _res);
-              writeLogOrder(_req, _res);
-              paintOrder(_req);
+              paintOrder(_req);        
            }
-        }        
+        }
      }
 }
 
@@ -49,8 +49,11 @@ void OnDeinit(const int reason)
 }
 
 void OnTick()
-{    Comment(StringFormat("ASK=%.6f  \nBID=%.6f  \nSPREAD=%G", 
+{    Comment(StringFormat("ASK=%.6f  \nBID=%.6f  \nSPREAD=%G  \nPATRIMONIO=%G  \nBENEFICIO=%G  \nLAST PROFIT:%G", 
      SymbolInfoDouble( Symbol(),SYMBOL_ASK), 
      SymbolInfoDouble( Symbol(),SYMBOL_BID), 
-     SymbolInfoInteger(Symbol(),SYMBOL_SPREAD)));
+     SymbolInfoInteger(Symbol(),SYMBOL_SPREAD),
+     AccountInfoDouble(ACCOUNT_EQUITY),
+     AccountInfoDouble(ACCOUNT_PROFIT),
+     lastAccountProfit));
 }
