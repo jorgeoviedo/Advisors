@@ -5,23 +5,14 @@ MqlTradeResult  _res;
 
 void OnTimer()
 {    readZZ();
-     checkZZForOpen(High,ORDER_TYPE_SELL);
-     checkZZForOpen(Low, ORDER_TYPE_BUY );
-     orderCheckModSLTP(_req, _res);
-     printZZ();
-}
-
-void checkZZForOpen(double &checkData[], ENUM_ORDER_TYPE type)
-{    if(evalZZ(checkData))
-     {  if(PositionsTotal()==0)
-        {  orderOpen(type, _req, _res);
-        }
-        else
-        {  if(!(_req.type == type))
-           {  orderDelete(_req, _res);
-           }
-        }
+     if(evalZZ(High)) 
+     {  orderCheckForOpen(ORDER_TYPE_SELL, _req, _res);
      }
+     else if(evalZZ(Low))
+     {  orderCheckForOpen(ORDER_TYPE_BUY, _req, _res);
+     }
+     orderCheckModSLTP(_req, _res);
+     //printZZ();
 }
 
 void OnInit()
