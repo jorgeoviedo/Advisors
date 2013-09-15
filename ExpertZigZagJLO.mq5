@@ -1,67 +1,68 @@
 MqlTradeRequest _req;
-MqlTradeResult  _res;
+MqlTradeResult _res;
 #include <Components\ZigZag.mqh>
 #include <Components\OrderManager.mqh>
 
-void OnInit()
-{    ResetLastError();
-     if (EventSetTimer(orderGetEventTimer(_Period)))
-     {   ZZinstance();
+void OnInit() {
+     ResetLastError();
+     if (EventSetTimer(orderGetEventTimer(_Period))) {
+         ZZinstance();
          orderInstanceLog();
      }
-     else
-     {   EventKillTimer();
+     else {
+         EventKillTimer();
          Print("Error: ", __FUNCTION__, __LINE__, GetLastError());
      }
 }
 
-void OnTimer()
-{    ZZread();
-     if (PositionsTotal()==0)
-     {   if (ZZeval(High)) 
-         {   orderOpen(ORDER_TYPE_SELL, _req, _res);
+void OnTimer() {
+     ZZread();
+     if (PositionsTotal() == 0) {
+         if (ZZeval(High)) {
+             orderOpen(ORDER_TYPE_SELL, _req, _res);
          }
-         else if (ZZeval(Low))
-         {        orderOpen(ORDER_TYPE_BUY, _req, _res);
+         else if (ZZeval(Low)) {
+             orderOpen(ORDER_TYPE_BUY, _req, _res);
          }
      }
      orderCheckModSLTP(_req, _res);
 }
 
-void OnTick()
-{    orderGetInfoOnTick();
+void OnTick() {
+     orderGetInfoOnTick();
 }
 
-void OnDeinit(const int reason)
-{    EventKillTimer();
+void OnDeinit(const int reason) {
+     EventKillTimer();
      FileClose(handleFile);
 }
 
+void OnTradeTransaction(const MqlTradeTransaction &trans, const MqlTradeRequest &request, const MqlTradeResult &result) {    
+     if (result.deal > 0) {   
+     ENUM_TRADE_TRANSACTION_TYPE type=(ENUM_TRADE_TRANSACTION_TYPE)trans.type;
+         Print("------------ResultDescription\r\n",TradeResultDescription(result));
+     }
+}
+
 //+------------------------------------------------------------------+
-//| TradeTransaction function                                        |
+//|  Returns the textual description of the request handling result  |
 //+------------------------------------------------------------------+
-void OnTradeTransaction(const MqlTradeTransaction &trans,
-                        const MqlTradeRequest &request,
-                        const MqlTradeResult &result)
+string TradeResultDescription(const MqlTradeResult &result)
   {
-//--- get transaction type as enumeration value 
-   ENUM_TRADE_TRANSACTION_TYPE type=(ENUM_TRADE_TRANSACTION_TYPE)trans.type;
-//--- if the transaction is the request handling result, only its name is displayed
-   //if(type==TRADE_TRANSACTION_DEAL_ADD)
-    // {
-      Print(EnumToString(type));
-      //--- display the handled request string name
-      //Print("------------RequestDescription\r\n",RequestDescription(request));
-      //--- display request result description
-      Print("------------ResultDescription\r\n",TradeResultDescription(result));
-      //--- store the order ticket for its deletion at the next handling in OnTick()
-//     }
-   //else // display the full description for transactions of another type
-//--- display description of the received transaction in the Journal
-      //Print("------------TransactionDescription\r\n",TransactionDescription(trans));
- 
-//---     
+//---
+   string desc="Retcode "+(string)result.retcode+"\r\n";
+   desc+="Request ID: "+StringFormat("%d",result.request_id)+"\r\n";
+   desc+="Order ticket: "+(string)result.order+"\r\n";
+   desc+="Deal ticket: "+(string)result.deal+"\r\n";
+   desc+="Volume: "+StringFormat("%G",result.volume)+"\r\n";
+   desc+="Price: "+StringFormat("%G",result.price)+"\r\n";
+   desc+="Ask: "+StringFormat("%G",result.ask)+"\r\n";
+   desc+="Bid: "+StringFormat("%G",result.bid)+"\r\n";
+   desc+="Comment: "+result.comment+"\r\n";
+//--- return the obtained string
+   return desc;
   }
+
 //+------------------------------------------------------------------+
 //|  Returns transaction textual description                         |
 //+------------------------------------------------------------------+
@@ -109,21 +110,4 @@ string RequestDescription(const MqlTradeRequest &request)
 //--- return the obtained string
    return desc;
   }
-//+------------------------------------------------------------------+
-//|  Returns the textual description of the request handling result  |
-//+------------------------------------------------------------------+
-string TradeResultDescription(const MqlTradeResult &result)
-  {
-//---
-   string desc="Retcode "+(string)result.retcode+"\r\n";
-   desc+="Request ID: "+StringFormat("%d",result.request_id)+"\r\n";
-   desc+="Order ticket: "+(string)result.order+"\r\n";
-   desc+="Deal ticket: "+(string)result.deal+"\r\n";
-   desc+="Volume: "+StringFormat("%G",result.volume)+"\r\n";
-   desc+="Price: "+StringFormat("%G",result.price)+"\r\n";
-   desc+="Ask: "+StringFormat("%G",result.ask)+"\r\n";
-   desc+="Bid: "+StringFormat("%G",result.bid)+"\r\n";
-   desc+="Comment: "+result.comment+"\r\n";
-//--- return the obtained string
-   return desc;
-  }
+ 
