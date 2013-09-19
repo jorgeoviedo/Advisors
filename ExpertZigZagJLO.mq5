@@ -48,33 +48,23 @@ void OnTradeTransaction(const MqlTradeTransaction &trans, const MqlTradeRequest 
      }
 }
 
-
 //+------------------------------------------------------------------+
 //| Devuelve la descripción literal de la transacción |
 //+------------------------------------------------------------------+
-string TransactionDescription(const MqlTradeTransaction &trans,
-const bool detailed=true)
- {
-//--- preparamos la cadena para el retorno desde la función
-string desc=EnumToString(trans.type)+"\r\n";
-//--- en el modo detallado agregamos el máximo de información
-if(detailed)
- {
- desc+="Symbol: "+trans.symbol+"\r\n";
- desc+="Deal ticket: "+(string)trans.deal+"\r\n";
- desc+="Deal type: "+EnumToString(trans.deal_type)+"\r\n";
- desc+="Order ticket: "+(string)trans.order+"\r\n";
- desc+="Order type: "+EnumToString(trans.order_type)+"\r\n";
- desc+="Order state: "+EnumToString(trans.order_state)+"\r\n";
- desc+="Order time type: "+EnumToString(trans.time_type)+"\r\n";
- desc+="Order expiration: "+TimeToString(trans.time_expiration)+"\r\n";
- desc+="Price: "+StringFormat("%G",trans.price)+"\r\n";
- desc+="Price trigger: "+StringFormat("%G",trans.price_trigger)+"\r\n";
- desc+="Stop Loss: "+StringFormat("%G",trans.price_sl)+"\r\n";
- desc+="Take Profit: "+StringFormat("%G",trans.price_tp)+"\r\n";
- desc+="Volume: "+StringFormat("%G",trans.volume)+"\r\n";
- }
-//--- devolvemos la cadena obtenida
-return desc;
- }
-//+---
+string TransactionDescription(const MqlTradeTransaction &trans, const bool detailed=true)
+{      string desc=EnumToString(trans.type)+"\r\n";
+       desc+="Symbol: "+trans.symbol+"\r\n";
+       desc+="Deal ticket: "+(string)trans.deal+"\r\n";
+       desc+="Deal type: "+EnumToString(trans.deal_type)+"\r\n";
+       desc+="Order ticket: "+(string)trans.order+"\r\n";
+       desc+="Order type: "+EnumToString(trans.order_type)+"\r\n";
+       desc+="Order state: "+EnumToString(trans.order_state)+"\r\n";
+       desc+="Order time type: "+EnumToString(trans.time_type)+"\r\n";
+       desc+="Order expiration: "+TimeToString(trans.time_expiration)+"\r\n";
+       desc+="Price: "+StringFormat("%G",trans.price)+"\r\n";
+       desc+="Price trigger: "+StringFormat("%G",trans.price_trigger)+"\r\n";
+       desc+="Stop Loss: "+StringFormat("%G",trans.price_sl)+"\r\n";
+       desc+="Take Profit: "+StringFormat("%G",trans.price_tp)+"\r\n";
+       desc+="Volume: "+StringFormat("%G",trans.volume)+"\r\n";
+       return desc;
+}
