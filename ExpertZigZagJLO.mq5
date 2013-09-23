@@ -37,35 +37,22 @@ void OnDeinit(const int reason) {
      FileClose(handleFile);
 }
 
-//void OnTradeTransaction(const MqlTradeTransaction &trans, const MqlTradeRequest &req, const MqlTradeResult &res) {
-//     if (((ENUM_TRADE_TRANSACTION_TYPE)trans.type == TRADE_TRANSACTION_ORDER_ADD) ||
-  //       ((ENUM_TRADE_TRANSACTION_TYPE)trans.type == TRADE_TRANSACTION_ORDER_DELETE)) {
-    //     Print("------------ TransactionDescription\r\n",
-      //   TransactionDescription(trans));
-      //   Print("Estamos en el horno");
-        // orderWriteLog(_req, _res);
-         //orderPaint(_req);
+void OnTradeTransaction(const MqlTradeTransaction &trans, const MqlTradeRequest &req, const MqlTradeResult &res) {
+   if (((ENUM_TRADE_TRANSACTION_TYPE)trans.type == TRADE_TRANSACTION_REQUEST) &&
+       ((ENUM_TRADE_REQUEST_ACTIONS)req.action == TRADE_ACTION_DEAL) &&
+        (res.retcode == TRADE_RETCODE_DONE)) {
+      orderPaint(_req);
+    }
+    else {
+      if ((ENUM_TRADE_TRANSACTION_TYPE)trans.type == TRADE_TRANSACTION_DEAL_ADD) { 
+         Print("------------TransactionDescription\r\n",TransactionDescription(trans));
+         Print("------------RequestDescription\r\n",RequestDescription(req));
+         Print("------------ResultDescription\r\n",TradeResultDescription(res));
+         orderPaint(_req);
+      }
+   }
+}
 
-void OnTradeTransaction(const MqlTradeTransaction &trans,
-const MqlTradeRequest &request,
-const MqlTradeResult &result)
- {
-ENUM_TRADE_TRANSACTION_TYPE type=(ENUM_TRADE_TRANSACTION_TYPE)trans.type;
-//--- si la transacción es el resultado de procesamiento de la solicitud, mostramos sólo su nombre
-if(type==TRADE_TRANSACTION_REQUEST)
- {
-Print(EnumToString(type));
-//--- mostramos la descripción de la solicitud procesada
-Print("------------RequestDescription\r\n",RequestDescription(request));
-//--- mostramos la descripción del resultado de la solicitud
-Print("------------ResultDescription\r\n",TradeResultDescription(result));
-//--- recordamos el ticket de la orden para su eliminación durante el siguiente procesamiento en OnTick()
- }
-else // para la transacción de otro tipo mostramos la descripción completa
-//--- mostramos la descripción de la transacción recibida en el Diario
-Print("------------TransactionDescription\r\n",TransactionDescription(trans));
-//--- 
- }
 //+------------------------------------------------------------------+
 //| Devuelve la descripción textual de la transacción |
 //+------------------------------------------------------------------+
