@@ -20,7 +20,7 @@ ENUM_ORDER_TYPE resEvalToOpenPosition;
 void OnInit() {
      ResetLastError();
      if (EventSetTimer(order.orderGetEventTimer(_Period))) {
-         indicator.zzInstance();
+         indicator.instance();
          order.orderInstanceLog();
      } else {
          EventKillTimer();
@@ -32,7 +32,7 @@ void OnInit() {
 //+------------------------------------------------------------------+
 void OnTimer() {
      if (PositionsTotal() == 0) {
-         resEvalToOpenPosition = indicator.zzEvalToOpenPosition();
+         resEvalToOpenPosition = indicator.evalToOpenPosition();
          if (resEvalToOpenPosition != NULL) {
              order.orderOpen(resEvalToOpenPosition);
          }
