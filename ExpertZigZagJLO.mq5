@@ -1,5 +1,6 @@
 #include <Components\ZigZag.mqh>
 #include <Components\OrderManager.mqh>
+ENUM_ORDER_TYPE resEvalToOpenPosition;
 
 void OnInit() {
      ResetLastError();
@@ -14,14 +15,13 @@ void OnInit() {
 
 void OnTimer() {
      if (PositionsTotal() == 0) {
-         zzRead();
-         if (zzEval(High)) {
+         resEvalToOpenPosition = zzEvalToOpenPosition();
+         if (resEvalToOpenPosition != NULL) {
              orderOpen(ORDER_TYPE_SELL);
-         } else if (zzEval(Low)) {
-             orderOpen(ORDER_TYPE_BUY);
          }
+     } else {
+         orderCheckModSLTP();
      }
-     //orderCheckModSLTP();
 }
 
 void OnTick() {
@@ -74,24 +74,24 @@ return desc;
 //+------------------------------------------------------------------+
 //| Devuelve la descripción textual de la solicitud comercial |
 //+------------------------------------------------------------------+
-string RequestDescription(const MqlTradeRequest &request)
+string RequestDescription(const MqlTradeRequest &_request)
  {
 //---
-string desc=EnumToString(request.action)+"\r\n";
- desc+="Symbol: "+request.symbol+"\r\n";
- desc+="Magic Number: "+StringFormat("%d",request.magic)+"\r\n";
- desc+="Order ticket: "+(string)request.order+"\r\n";
- desc+="Order type: "+EnumToString(request.type)+"\r\n";
- desc+="Order filling: "+EnumToString(request.type_filling)+"\r\n";
- desc+="Order time type: "+EnumToString(request.type_time)+"\r\n";
- desc+="Order expiration: "+TimeToString(request.expiration)+"\r\n";
- desc+="Price: "+StringFormat("%G",request.price)+"\r\n";
- desc+="Deviation points: "+StringFormat("%G",request.deviation)+"\r\n";
- desc+="Stop Loss: "+StringFormat("%G",request.sl)+"\r\n";
- desc+="Take Profit: "+StringFormat("%G",request.tp)+"\r\n";
- desc+="Stop Limit: "+StringFormat("%G",request.stoplimit)+"\r\n";
- desc+="Volume: "+StringFormat("%G",request.volume)+"\r\n";
- desc+="Comment: "+request.comment+"\r\n";
+string desc=EnumToString(_request.action)+"\r\n";
+ desc+="Symbol: "+_request.symbol+"\r\n";
+ desc+="Magic Number: "+StringFormat("%d",_request.magic)+"\r\n";
+ desc+="Order ticket: "+(string)_request.order+"\r\n";
+ desc+="Order type: "+EnumToString(_request.type)+"\r\n";
+ desc+="Order filling: "+EnumToString(_request.type_filling)+"\r\n";
+ desc+="Order time type: "+EnumToString(_request.type_time)+"\r\n";
+ desc+="Order expiration: "+TimeToString(_request.expiration)+"\r\n";
+ desc+="Price: "+StringFormat("%G",_request.price)+"\r\n";
+ desc+="Deviation points: "+StringFormat("%G",_request.deviation)+"\r\n";
+ desc+="Stop Loss: "+StringFormat("%G",_request.sl)+"\r\n";
+ desc+="Take Profit: "+StringFormat("%G",_request.tp)+"\r\n";
+ desc+="Stop Limit: "+StringFormat("%G",_request.stoplimit)+"\r\n";
+ desc+="Volume: "+StringFormat("%G",_request.volume)+"\r\n";
+ desc+="Comment: "+_request.comment+"\r\n";
 //--- devolvemos la cadena obtenida
 return desc;
  }
@@ -100,18 +100,18 @@ return desc;
 //| Devuelve la descripción textual del resultado de procesamiento |
 //| de la solicitud |
 //+------------------------------------------------------------------+
-string TradeResultDescription(const MqlTradeResult &result)
+string TradeResultDescription(const MqlTradeResult &_result)
  {
 //---
-string desc="Retcode "+(string)result.retcode+"\r\n";
- desc+="Request ID: "+StringFormat("%d",result.request_id)+"\r\n";
- desc+="Order ticket: "+(string)result.order+"\r\n";
- desc+="Deal ticket: "+(string)result.deal+"\r\n";
- desc+="Volume: "+StringFormat("%G",result.volume)+"\r\n";
- desc+="Price: "+StringFormat("%G",result.price)+"\r\n";
- desc+="Ask: "+StringFormat("%G",result.ask)+"\r\n";
- desc+="Bid: "+StringFormat("%G",result.bid)+"\r\n";
- desc+="Comment: "+result.comment+"\r\n";
+string desc="Retcode "+(string)_result.retcode+"\r\n";
+ desc+="Request ID: "+StringFormat("%d",_result.request_id)+"\r\n";
+ desc+="Order ticket: "+(string)_result.order+"\r\n";
+ desc+="Deal ticket: "+(string)_result.deal+"\r\n";
+ desc+="Volume: "+StringFormat("%G",_result.volume)+"\r\n";
+ desc+="Price: "+StringFormat("%G",_result.price)+"\r\n";
+ desc+="Ask: "+StringFormat("%G",_result.ask)+"\r\n";
+ desc+="Bid: "+StringFormat("%G",_result.bid)+"\r\n";
+ desc+="Comment: "+_result.comment+"\r\n";
 //--- devolvemos la cadena obtenida
 return desc;
  }
