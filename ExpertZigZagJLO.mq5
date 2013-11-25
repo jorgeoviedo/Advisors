@@ -13,8 +13,8 @@ void OnInit() {
 }
 
 void OnTimer() {
-   zzRead();
      if (PositionsTotal() == 0) {
+         zzRead();
          if (zzEval(High)) {
              orderOpen(ORDER_TYPE_SELL);
          } else if (zzEval(Low)) {
