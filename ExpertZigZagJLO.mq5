@@ -1,9 +1,22 @@
+//+------------------------------------------------------------------+
+//|                                                       Order.mqh  |
+//|                        Copyright 2013, MetaQuotes Software Corp. |
+//|                                              http://www.mql5.com |
+//+------------------------------------------------------------------+
+#property copyright "Copyright 2013, MetaQuotes Software Corp."
+#property link      "http://www.mql5.com"
+#property version   "1.00"
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
 #include <Components\Order.mqh>
 #include <Components\ZigZag.mqh>
 Order order;
 ZigZag indicator;
 ENUM_ORDER_TYPE resEvalToOpenPosition;
-
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
 void OnInit() {
      ResetLastError();
      if (EventSetTimer(order.orderGetEventTimer(_Period))) {
@@ -14,27 +27,35 @@ void OnInit() {
          Print("Error: ", __FUNCTION__, __LINE__, GetLastError());
      }
 }
-
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
 void OnTimer() {
      if (PositionsTotal() == 0) {
          resEvalToOpenPosition = indicator.zzEvalToOpenPosition();
          if (resEvalToOpenPosition != NULL) {
-             order.orderOpen(ORDER_TYPE_SELL);
+             order.orderOpen(resEvalToOpenPosition);
          }
      } else {
          order.orderCheckModSLTP();
      }
 }
-
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
 void OnTick() {
      order.orderGetInfoOnTick();
 }
-
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
 void OnDeinit(const int reason) {
      EventKillTimer();
      FileClose(order.getHandleFile());
 }
-
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
 void OnTradeTransaction(const MqlTradeTransaction &_trans, const MqlTradeRequest &_req, const MqlTradeResult &_res) {
    if (((ENUM_TRADE_TRANSACTION_TYPE)_trans.type == TRADE_TRANSACTION_REQUEST) &&
        ((ENUM_TRADE_REQUEST_ACTIONS)_req.action == TRADE_ACTION_DEAL) &&
