@@ -1,12 +1,14 @@
+#include <Components\Order.mqh>
 #include <Components\ZigZag.mqh>
-#include <Components\OrderManager.mqh>
+Order order;
+ZigZag indicator;
 ENUM_ORDER_TYPE resEvalToOpenPosition;
 
 void OnInit() {
      ResetLastError();
-     if (EventSetTimer(orderGetEventTimer(_Period))) {
-         zzInstance();
-         orderInstanceLog();
+     if (EventSetTimer(order.orderGetEventTimer(_Period))) {
+         indicator.zzInstance();
+         order.orderInstanceLog();
      } else {
          EventKillTimer();
          Print("Error: ", __FUNCTION__, __LINE__, GetLastError());
@@ -15,35 +17,35 @@ void OnInit() {
 
 void OnTimer() {
      if (PositionsTotal() == 0) {
-         resEvalToOpenPosition = zzEvalToOpenPosition();
+         resEvalToOpenPosition = indicator.zzEvalToOpenPosition();
          if (resEvalToOpenPosition != NULL) {
-             orderOpen(ORDER_TYPE_SELL);
+             order.orderOpen(ORDER_TYPE_SELL);
          }
      } else {
-         orderCheckModSLTP();
+         order.orderCheckModSLTP();
      }
 }
 
 void OnTick() {
-     orderGetInfoOnTick();
+     order.orderGetInfoOnTick();
 }
 
 void OnDeinit(const int reason) {
      EventKillTimer();
-     FileClose(handleFile);
+     FileClose(order.getHandleFile());
 }
 
 void OnTradeTransaction(const MqlTradeTransaction &_trans, const MqlTradeRequest &_req, const MqlTradeResult &_res) {
    if (((ENUM_TRADE_TRANSACTION_TYPE)_trans.type == TRADE_TRANSACTION_REQUEST) &&
        ((ENUM_TRADE_REQUEST_ACTIONS)_req.action == TRADE_ACTION_DEAL) &&
         (_res.retcode == TRADE_RETCODE_DONE)) {
-         orderPaint();
+         order.orderPaint();
     } else {
          if ((ENUM_TRADE_TRANSACTION_TYPE)_trans.type == TRADE_TRANSACTION_DEAL_ADD) { 
             Print("------------TransactionDescription\r\n",TransactionDescription(_trans));
             Print("------------RequestDescription\r\n",RequestDescription(_req));
             Print("------------ResultDescription\r\n",TradeResultDescription(_res));
-            orderPaint();
+            order.orderPaint();
       }
    }
 }
