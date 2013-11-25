@@ -1,31 +1,27 @@
-MqlTradeRequest _req;
-MqlTradeResult _res;
 #include <Components\ZigZag.mqh>
 #include <Components\OrderManager.mqh>
 
 void OnInit() {
      ResetLastError();
      if (EventSetTimer(orderGetEventTimer(_Period))) {
-         ZZinstance();
+         zzInstance();
          orderInstanceLog();
-     }
-     else {
+     } else {
          EventKillTimer();
          Print("Error: ", __FUNCTION__, __LINE__, GetLastError());
      }
 }
 
 void OnTimer() {
-     ZZread();
+   zzRead();
      if (PositionsTotal() == 0) {
-         if (ZZeval(High)) {
-             orderOpen(ORDER_TYPE_SELL, _req, _res);
-         }
-         else if (ZZeval(Low)) {
-             orderOpen(ORDER_TYPE_BUY, _req, _res);
+         if (zzEval(High)) {
+             orderOpen(ORDER_TYPE_SELL);
+         } else if (zzEval(Low)) {
+             orderOpen(ORDER_TYPE_BUY);
          }
      }
-     orderCheckModSLTP(_req, _res);
+     //orderCheckModSLTP();
 }
 
 void OnTick() {
@@ -37,18 +33,17 @@ void OnDeinit(const int reason) {
      FileClose(handleFile);
 }
 
-void OnTradeTransaction(const MqlTradeTransaction &trans, const MqlTradeRequest &req, const MqlTradeResult &res) {
-   if (((ENUM_TRADE_TRANSACTION_TYPE)trans.type == TRADE_TRANSACTION_REQUEST) &&
-       ((ENUM_TRADE_REQUEST_ACTIONS)req.action == TRADE_ACTION_DEAL) &&
-        (res.retcode == TRADE_RETCODE_DONE)) {
-      orderPaint(_req);
-    }
-    else {
-      if ((ENUM_TRADE_TRANSACTION_TYPE)trans.type == TRADE_TRANSACTION_DEAL_ADD) { 
-         Print("------------TransactionDescription\r\n",TransactionDescription(trans));
-         Print("------------RequestDescription\r\n",RequestDescription(req));
-         Print("------------ResultDescription\r\n",TradeResultDescription(res));
-         orderPaint(_req);
+void OnTradeTransaction(const MqlTradeTransaction &_trans, const MqlTradeRequest &_req, const MqlTradeResult &_res) {
+   if (((ENUM_TRADE_TRANSACTION_TYPE)_trans.type == TRADE_TRANSACTION_REQUEST) &&
+       ((ENUM_TRADE_REQUEST_ACTIONS)_req.action == TRADE_ACTION_DEAL) &&
+        (_res.retcode == TRADE_RETCODE_DONE)) {
+         orderPaint();
+    } else {
+         if ((ENUM_TRADE_TRANSACTION_TYPE)_trans.type == TRADE_TRANSACTION_DEAL_ADD) { 
+            Print("------------TransactionDescription\r\n",TransactionDescription(_trans));
+            Print("------------RequestDescription\r\n",RequestDescription(_req));
+            Print("------------ResultDescription\r\n",TradeResultDescription(_res));
+            orderPaint();
       }
    }
 }
